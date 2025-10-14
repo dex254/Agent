@@ -7,9 +7,16 @@ use App\Http\Controllers\ProfileController;
 Route::get('/', function () {
     return view('Agent.Login');
 });
+
+
+
 Route::get('/Sign_up', [AgentController::class, 'signup'])->name('Agent.Register');
 Route::post('/registration', [AgentController::class, 'register'])->name('agent.register');
 Route::get('/reset_password', [AgentController::class, 'password'])->name('Agent.Password');
+//the  temprary password  part 
+Route::post('/Password', [AgentController::class, 'agentTempPassword'])->name('Agent.reset');
+ Route::get('/agent/set-password/{token}', [AgentController::class, 'showSetPasswordForm'])->name('Agent.Set');
+Route::post('/agent/set-password', [AgentController::class, 'setNewPassword'])->name('Agent.set.password'); 
 
 Route::get('/dashboard', function () {
     return view('dashboard');
