@@ -9,11 +9,13 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Mail\TemporaryPasswordMail;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
-use App\Mail\TemporaryPasswordMail;
+use Illuminate\Support\Facades\RateLimiter;
 
 class AgentController extends Controller
 {
@@ -179,28 +181,129 @@ public function setNewPassword(Request $request)
 {
     $request->validate([
         'reset_token' => 'required',
-        'new_password' => 'required|string|min:8|confirmed',  // confirmed expects 'new_password_confirmation'
+        'password' => 'required|string|min:8|confirmed', // Matches password + password_confirmation
     ]);
 
+    // Check if the token is valid and not expired
     $agent = Agent::where('reset_token', $request->reset_token)
-              ->where('temp_password_expiry', '>', Carbon::now())
-              ->first();
+                  ->where('temp_password_expiry', '>', Carbon::now())
+                  ->first();
 
     if (!$agent) {
-        return redirect()->route('agent')->withErrors(['token' => 'This password reset token is invalid or expired.']);
+        return redirect()
+            ->route('agent')
+            ->withErrors(['token' => 'This password reset link is invalid or has expired. Please request a new one.']);
     }
 
     // Update the password
-    $agent->password = Hash::make($request->new_password);
-   
+    $agent->password = Hash::make($request->password);
 
-    // Clear temporary password and token
+    // Clear temporary password data
     $agent->temp_password = null;
     $agent->temp_password_expiry = null;
     $agent->reset_token = null;
 
     $agent->save();
 
-    return redirect()->route('agent')->with('success', 'Your password has been updated successfully. Please login.');
+    return redirect()
+        ->route('agent')
+        ->with('success', 'Your password has been updated successfully. You can now log in.');
 }
+public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => ['required', 'string', 'min:8'],
+        ]);
+
+        $ip = $request->ip();
+        $key = Str::lower($credentials['email']) . '|' . $ip;
+
+        // ✅ Throttle login attempts
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            $seconds = RateLimiter::availableIn($key);
+            return back()->with('error', "Too many login attempts. Please try again in {$seconds} seconds.");
+        }
+
+        $agent = Agent::where('email', $credentials['email'])->first();
+
+        // ✅ Invalid credentials
+        if (!$agent || !Hash::check($credentials['password'], $agent->password)) {
+            RateLimiter::hit($key, 60);
+            $agent?->increment('failed_attempts');
+            return redirect()->route('agent')
+                ->withErrors(['email' => 'Invalid email or password.'])
+                ->withInput();
+        }
+
+        // ✅ Inactive account
+        if (strtolower($agent->status) !== 'pending') {
+            return redirect()->route('agent')
+                ->with('error', 'Your account is not active. Contact support.');
+        }
+
+        // ✅ Successful login: reset failed attempts and update metadata
+        $agent->update([
+            'failed_attempts' => 0,
+            'is_online' => true,
+            'login_time' => Carbon::now('Africa/Nairobi'),
+            'last_login_ip' => $ip,
+        ]);
+
+        // ✅ Clear any rate limit
+        RateLimiter::clear($key);
+
+        // ✅ Secure session
+        $request->session()->regenerate();
+        session(['last_regeneration' => now()]);
+        session(['last_activity' => now()]);
+
+        // ✅ Authenticate
+        Auth::guard('agent')->login($agent);
+
+        // ✅ Redirect to dashboard
+        return redirect()->route('Agent.Dashboard')
+            ->with('success', 'Welcome back, ' . $agent->name . '!');
+    }
+
+    /**
+     * Agent Dashboard
+     */
+    public function Dashboard(Request $request)
+    {
+        // ✅ Ensure the agent is authenticated
+        $agent = Auth::guard('agent')->user();
+
+        if (!$agent) {
+            return redirect()->route('agent')->with('error', 'Please log in first.');
+        }
+          $agents = Agent::orderBy('created_at', 'desc')->get();
+
+        // ✅ Pass authenticated agent to the dashboard view
+        return view('Agent.Dashboard', compact('agent','agents'));
+    }
+
+   public function agentlogout(Request $request)
+{
+    $agent = Auth::guard('agent')->user();
+
+    if ($agent) {
+        // ✅ Update logout time and online status
+        $agent->update([
+            'is_online' => false,
+            'logout_time' => now('Africa/Nairobi'),
+        ]);
+    }
+
+    // ✅ Log out securely
+    Auth::guard('agent')->logout();
+
+    // ✅ Invalidate session and regenerate CSRF token
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    // ✅ Redirect to login page with a success popup
+    return redirect()->route('agent')->with('success', 'You have been logged out successfully.');
+}
+
 }
