@@ -217,10 +217,13 @@
 <div class="ai-chat-wrap">
     <div class="chat-card">
         <header class="chat-header">
-            <div class="brand">KSG AI</div>
+            <div class="brand">KSG </div>
             <div style="font-size:13px; color:#e8f8f1;">Ask about our programs — powered by Denis (Full Stack Dev)</div>
         </header>
 
+
+
+        
         <main id="chat-box">
             <div class="messages" id="messages">
                 @forelse($chats->reverse() as $chat)
