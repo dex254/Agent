@@ -10,6 +10,7 @@ class ChatHistory extends Model
     use HasFactory;
 
     protected $fillable = [
+        'guest_id',
         'ip_address',
         'user_question',
         'ai_answer',

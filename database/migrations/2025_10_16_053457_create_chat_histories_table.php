@@ -12,6 +12,7 @@ return new class extends Migration {
             $table->string('ip_address')->index();
             $table->text('user_question');
             $table->longText('ai_answer')->nullable();
+            $table->string('guest_id')->nullable();
             $table->timestamps();
         });
     }
