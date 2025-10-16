@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AgentController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProgramAIController;
 
 Route::get('/', function () {
     return view('Agent.Login');
@@ -17,6 +18,8 @@ Route::get('/reset_password', [AgentController::class, 'password'])->name('Agent
 Route::post('/Password', [AgentController::class, 'agentTempPassword'])->name('Agent.reset');
  Route::get('/agent/set-password/{token}', [AgentController::class, 'showSetPasswordForm'])->name('Agent.Set');
 Route::post('/agent/set-password', [AgentController::class, 'setNewPassword'])->name('Agent.set.password'); 
+Route::get('/ai', [ProgramAIController::class, 'index'])->name('ai.chat');
+Route::post('/ai/chat', [ProgramAIController::class, 'ask'])->name('ai.chat.ask');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
