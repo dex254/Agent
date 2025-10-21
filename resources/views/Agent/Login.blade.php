@@ -67,6 +67,31 @@
                     <p class="text-danger fs-14 mb-4">Don't have an account? <a href="{{ route('Agent.Register') }}" class="fw-semibold text-dark ms-1">Sign Up !</a></p>
 
                     <p class="fs-13 fw-semibold">Or Login with Social</p>
+                     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+@if(session('success'))
+<script>
+Swal.fire({
+    icon: 'success',
+    title: 'Success',
+    text: '{{ session('success') }}',
+    confirmButtonColor: '#3085d6',
+    confirmButtonText: 'OK'
+});
+</script>
+@endif
+
+@if(session('error'))
+<script>
+Swal.fire({
+    icon: 'error',
+    title: 'Registration Failed',
+    text: '{{ session('error') }}',
+    confirmButtonColor: '#d33',
+    confirmButtonText: 'Try Again'
+});
+</script>
+@endif
 
                    
 

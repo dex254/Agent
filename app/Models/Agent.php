@@ -35,28 +35,23 @@ class Agent extends Authenticatable
         'activity',
         'securitykey',
         'campus',
-        'temporary_password_token',
+        
         'role',
+        'temp_password',
+        'temp_password_expiry',
+        'reset_token',
     ];
 
-    /**
-     * The attributes that should be hidden for arrays / JSON.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
-        'temporary_password_token',
-        'remember_token', // if you add it
+        'temp_password',
+        'reset_token',
+        'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'login_time' => 'datetime',
         'logout_time' => 'datetime',
+        'temp_password_expiry' => 'datetime',
     ];
 }

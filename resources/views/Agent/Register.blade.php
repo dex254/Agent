@@ -50,18 +50,126 @@
             <small class="text-danger">{{ $message }}</small>
         @enderror
 
-                        <div class="mb-3">
-                            <label class="form-label" for="example-password">Password</label>
-                            <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password">
-                        </div>
-                         @error('password')
-            <small class="text-danger">{{ $message }}</small>
-        @enderror
+                       <div class="mb-3">
+                        <style>
+                            #passwordStrength {
+    font-weight: 600;
+    margin-top: 5px;
+}
+.input-group .btn {
+    border-radius: 0 5px 5px 0;
+}
 
-                         <div class="mb-3">
-                            <label class="form-label" for="example-password">  Confirm Password</label>
-                            <input type="password" id="password_confirmation" name="password_confirmation" class="form-control" placeholder="Enter your password">
+                            </style>
+    <label for="password" class="form-label">Password</label>
+    <div class="input-group">
+        <input type="password" id="password" name="password" class="form-control" required minlength="8" placeholder="Enter password">
+        <button type="button" class="btn btn-outline-secondary" id="togglePassword">Show</button>
+    </div>
+    <small id="passwordStrength" class="form-text text-muted"></small>
+</div>
+
+<div class="mb-3">
+    <label for="password_confirmation" class="form-label">Confirm Password</label>
+    <div class="input-group">
+        <input type="password" id="password_confirmation" name="password_confirmation" class="form-control" required minlength="8" placeholder="Confirm password">
+        <button type="button" class="btn btn-outline-secondary" id="togglePasswordConfirm">Show</button>
+    </div>
+</div>
+
+<!-- Password Suggestion -->
+ <div class="d-flex justify-content-between mb-3">
+                            <label class="form-label">Suggested Strong Password:</label>
+    <div class="input-group">
+        <input type="text" id="suggestedPassword" class="form-control" readonly>
+        <button type="button" class="btn btn-success" id="usePassword">Use This</button>
+    </div>
                         </div>
+
+<script>
+    // 🔒 Password Strength Checker
+    const password = document.getElementById('password');
+    const strengthText = document.getElementById('passwordStrength');
+
+    password.addEventListener('input', () => {
+        const value = password.value;
+        let strength = 0;
+
+        if (value.match(/[a-z]/)) strength++;
+        if (value.match(/[A-Z]/)) strength++;
+        if (value.match(/[0-9]/)) strength++;
+        if (value.match(/[^a-zA-Z0-9]/)) strength++;
+        if (value.length >= 8) strength++;
+
+        let text = '';
+        let color = '';
+
+        switch (strength) {
+            case 0:
+            case 1:
+                text = 'Weak password 🔴';
+                color = 'red';
+                break;
+            case 2:
+            case 3:
+                text = 'Medium password 🟡';
+                color = 'orange';
+                break;
+            case 4:
+            case 5:
+                text = 'Strong password 🟢';
+                color = 'green';
+                break;
+        }
+
+        strengthText.innerHTML = text;
+        strengthText.style.color = color;
+    });
+
+    // 👁️ Toggle Show/Hide Password
+    document.getElementById('togglePassword').addEventListener('click', function () {
+        const input = document.getElementById('password');
+        if (input.type === 'password') {
+            input.type = 'text';
+            this.textContent = 'Hide';
+        } else {
+            input.type = 'password';
+            this.textContent = 'Show';
+        }
+    });
+
+    document.getElementById('togglePasswordConfirm').addEventListener('click', function () {
+        const input = document.getElementById('password_confirmation');
+        if (input.type === 'password') {
+            input.type = 'text';
+            this.textContent = 'Hide';
+        } else {
+            input.type = 'password';
+            this.textContent = 'Show';
+        }
+    });
+
+    // 🔐 Suggest Random Strong Password
+    function generateStrongPassword() {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+~";
+        let pass = "";
+        for (let i = 0; i < 12; i++) {
+            pass += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return pass;
+    }
+
+    const suggestedPassword = document.getElementById('suggestedPassword');
+    suggestedPassword.value = generateStrongPassword();
+
+    document.getElementById('usePassword').addEventListener('click', function () {
+        password.value = suggestedPassword.value;
+        document.getElementById('password_confirmation').value = suggestedPassword.value;
+        strengthText.innerHTML = 'Strong password 🟢';
+        strengthText.style.color = 'green';
+    });
+</script>
+
                         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 @if(session('success'))

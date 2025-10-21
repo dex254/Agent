@@ -12,16 +12,16 @@
     <link rel="shortcut icon" href="assets/images/logo-dark.png">
 
     <!-- Theme Config Js -->
-    <script src="assets/js/config.js"></script>
+    <script src="{{asset('') }}assets/js/config.js"></script>
 
     <!-- Vendor css -->
-    <link href="assets/css/vendor.min.css" rel="stylesheet" type="text/css" />
+    <link href="{{asset('') }}assets/css/vendor.min.css" rel="stylesheet" type="text/css" />
 
     <!-- App css -->
-    <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" id="app-style" />
+    <link href="{{asset('') }}assets/css/app.min.css" rel="stylesheet" type="text/css" id="app-style" />
 
     <!-- Icons css -->
-    <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+    <link href="{{asset('') }}assets/css/icons.min.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body class="h-100">
@@ -31,32 +31,33 @@
             <div class="col-xl-4 col-lg-5 col-md-6">
                 <div class="card overflow-hidden text-center h-100 p-xxl-4 p-3 mb-0">
                     <a href="index.html" class="auth-brand mb-3">
-                        <img src="assets/images/logo-dark.png" alt="dark logo" height="24" class="logo-dark">
-                        <img src="assets/images/logo.png" alt="logo light" height="24" class="logo-light">
+                        <img src="{{asset('') }}assets/images/logo-dark.png" alt="dark logo" height="24" class="logo-dark">
+                        <img src="{{asset('') }}assets/images/logo.png" alt="logo light" height="24" class="logo-light">
                     </a>
 
                     <h4 class="fw-semibold mb-2">Welcome to Reset  Password</h4>
 
-                    <p class="text-muted mb-4">Enter your email address  you  will get  a  password   reset  link  on  the email.</p>
+                    <p class="text-muted mb-4">Enter a  strong  password.</p>
 
-                    <form action="{{ route('Agent.reset') }}" method="POST" class="text-start mb-3">
+                    <form action="{{ route('Agent.set.password') }}" method="POST" class="text-start mb-3">
                         @csrf
-                       
+                       <input type="hidden" name="reset_token" value="{{ $agent->reset_token }}">
 
                         <div class="mb-3">
-                            <label class="form-label" for="example-email">Email</label>
-                            <input type="email" id="example-email" name="email" class="form-control" placeholder="Enter your email">
+                            <label class="form-label" for="example-email">New Password</label>
+                            <input type="password" id="example-email" name="password" class="form-control" placeholder="pass">
                         </div>
-                        @error('email')
-            <small class="text-danger">{{ $message }}</small>
-        @enderror
+                         <div class="mb-3">
+                            <label class="form-label" for="example-email">Confirm Password</label>
+                            <input type="password" id="example-email" name="new_password_confirmation" class="form-control" placeholder="pass">
+                        </div>
 
                        
 
                       
 
                         <div class="d-grid">
-                            <button class="btn btn-primary" type="submit">Get  reset  link</button>
+                            <button class="btn btn-primary" type="submit">Save</button>
                         </div>
                     </form>
 
@@ -99,10 +100,10 @@ Swal.fire({
     </div>
 
     <!-- Vendor js -->
-    <script src="assets/js/vendor.min.js"></script>
+    <script src="{{asset('') }}assets/js/vendor.min.js"></script>
 
     <!-- App js -->
-    <script src="assets/js/app.js"></script>
+    <script src="{{asset('') }}assets/js/app.js"></script>
 
 </body>
 

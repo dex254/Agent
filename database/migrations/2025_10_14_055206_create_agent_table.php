@@ -29,7 +29,9 @@ return new class extends Migration
             $table->string('securitykey')->nullable();
             $table->string('campus')->nullable();
              $table->string('role')->nullable();
-            $table->string('temporary_password_token')->nullable();
+           $table->string('temp_password')->nullable();
+            $table->timestamp('temp_password_expiry')->nullable();
+            $table->string('reset_token', 100)->nullable()->unique();
 
             // Optional if you use "remember me" feature
             $table->rememberToken();
