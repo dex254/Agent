@@ -39,27 +39,118 @@
 
                     <p class="text-muted mb-4">Enter a  strong  password.</p>
 
-                    <form action="{{ route('Agent.set.password') }}" method="POST" class="text-start mb-3">
-                        @csrf
-                       <input type="hidden" name="reset_token" value="{{ $agent->reset_token }}">
+                   <form action="{{ route('Agent.set.password') }}" method="POST" class="text-start mb-3">
+    @csrf
+    <input type="hidden" name="reset_token" value="{{ $agent->reset_token }}">
 
-                        <div class="mb-3">
-                            <label class="form-label" for="example-email">New Password</label>
-                            <input type="password" id="example-email" name="password" class="form-control" placeholder="pass">
-                        </div>
-                         <div class="mb-3">
-                            <label class="form-label" for="example-email">Confirm Password</label>
-                            <input type="password" id="example-email" name="new_password_confirmation" class="form-control" placeholder="pass">
-                        </div>
+    <div class="mb-3 position-relative">
+        <label class="form-label" for="password">New Password</label>
+        <div class="input-group password-wrapper">
+            <input type="password" id="password" name="password" class="form-control password-input" placeholder="Enter new password">
+            <button type="button" class="btn btn-outline-secondary toggle-password" data-target="password">
+                <i class="fa fa-eye"></i>
+            </button>
+        </div>
+    </div>
 
-                       
+    <div class="mb-3 position-relative">
+        <label class="form-label" for="password_confirmation">Confirm Password</label>
+        <div class="input-group password-wrapper">
+            <input type="password" id="password_confirmation" name="password_confirmation" class="form-control password-input" placeholder="Confirm new password">
+            <button type="button" class="btn btn-outline-secondary toggle-password" data-target="password_confirmation">
+                <i class="fa fa-eye"></i>
+            </button>
+        </div>
+    </div>
 
-                      
+    <div class="d-grid">
+        <button class="btn btn-primary" type="submit">Reset Password</button>
+    </div>
+</form>
 
-                        <div class="d-grid">
-                            <button class="btn btn-primary" type="submit">Save</button>
-                        </div>
-                    </form>
+<!-- Password Toggle Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleButtons = document.querySelectorAll('.toggle-password');
+
+    toggleButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const input = document.getElementById(targetId);
+            const icon = this.querySelector('i');
+
+            // Add animation
+            input.classList.add('password-toggle-anim');
+            setTimeout(() => input.classList.remove('password-toggle-anim'), 200);
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+                this.classList.add('active');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+                this.classList.remove('active');
+            }
+        });
+    });
+});
+</script>
+
+<!-- Styling -->
+<style>
+/* Basic eye button */
+.toggle-password {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    transition: all 0.3s ease;
+}
+.toggle-password.active {
+    background-color: #198754;
+    color: white;
+}
+
+/* Password animation */
+.password-input {
+    transition: all 0.3s ease;
+    position: relative;
+}
+.password-toggle-anim {
+    transform: scale(1.02);
+    background-color: #f0fff0;
+    box-shadow: 0 0 6px rgba(0, 255, 102, 0.3);
+}
+
+/* Icon rotation animation */
+.toggle-password i {
+    transition: transform 0.3s ease;
+}
+.toggle-password.active i {
+    transform: rotate(180deg);
+}
+
+/* Smooth fade on input visibility */
+.password-wrapper {
+    overflow: hidden;
+}
+.password-input {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+.password-input[type="text"] {
+    opacity: 1;
+}
+.password-input[type="password"] {
+    opacity: 1;
+}
+</style>
+
+<!-- Include Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+
 
                     <p class="text-danger fs-14 mb-4">Already have an account? <a href="/" class="fw-semibold text-dark ms-1">Login !</a></p>
 

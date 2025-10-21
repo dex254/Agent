@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AgentController;
+use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
@@ -62,10 +63,12 @@ Route::middleware('auth')->group(function () {
         
 });
 Route::middleware('AGENT.auth')->group(function () {
-     Route::get('/home', [ApiController::class, 'apiDashboard'])->name('API.Dashboard');
-     //MPESA  API
-     Route::get('/pay', [MpesaController::class, 'showForm'])->name('MPESA.SendMoney');
-Route::post('/pay', [MpesaController::class, 'initiateStkPush'])->name('pay.initiate');
+     Route::get('/home', [AgentController::class, 'Dashboard'])->name('Agent.Dashboard');
+     //logout post
+     Route::post('/agent/logout', [AgentController::class, 'agentlogout'])->name('agent.logout');
+
+     Route::get('/Programs_to_ai', [ProgramController::class, 'Program'])->name('Program.Add');
+Route::post('/program', [ProgramController::class, 'postprogram'])->name('Program.Post');
  Route::get('/Whats_app', [WhatsAppController::class, 'WhatsApp'])->name('WhatsApp.Send');
  Route::post('/whatsapp/send', [WhatsAppController::class, 'sendMessage'])->name('whatsapp.send');
  //ai
